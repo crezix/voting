@@ -1,4 +1,3 @@
-pragma solidity >=0.6.0 <0.8.0;
 // SPDX-License-Identifier: MIT
 
 pragma solidity >=0.6.0 <0.8.0;
@@ -92,6 +91,7 @@ contract Vote is Ownable{
     }
 
     address[] public candidates;
+    uint public candidatesCount;
     mapping(address=>uint256) public votes;
     mapping(address=>candidate) public candidateData;
     mapping(address=> voter) public voterData;
@@ -117,6 +117,7 @@ contract Vote is Ownable{
         candidates.push(candidateAddress);
         candidateData[candidateAddress].name = name;
         candidateData[candidateAddress].party = party;
+        candidatesCount +=1;
         return true;
     }
 
@@ -129,8 +130,13 @@ contract Vote is Ownable{
         return true;
     }
 
-    function vote(address candidateAddress) external isVoted(msg.sender) returns(bool){
+    function vote(address candidateAddress) external isVoted(msg.sender) isVoter(msg.sender) returns(bool){
         votes[candidateAddress]+=1;
+        voted[msg.sender]=true;
         return true;
+    }
+    
+    function getCandidates() public view returns(address[] memory registeredCandidates){
+        registeredCandidates = candidates;
     }
 }
