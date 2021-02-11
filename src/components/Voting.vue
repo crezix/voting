@@ -60,22 +60,32 @@ export default {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, abi, signer);
-    contract.voterData(window.ethereum.selectedAddress).then((data) => {
-      _this.vName = data.name;
-      _this.nic = data.nic;
-      _this.refNo = Number(data.refNo);
-      _this.province = data.province;
+    contract.voterData(window.ethereum.selectedAddress).then((data, err) => {
+      if (!err) {
+        _this.vName = data.name;
+        _this.nic = data.nic;
+        _this.refNo = Number(data.refNo);
+        _this.province = data.province;
+      } else {
+        window.location.href = '/';
+      }
     });
-    contract.getCandidates().then((data) => {
+    contract.getCandidates().then((data, error) => {
       var i = 0;
-      for (i = 0; i < data.length; i++) {
-        var address = data[i];
-        contract.candidateData(address).then((candidate) => {
-          _this.items.push({
-            name: candidate.name,
-            address: address,
+      if (!error) {
+        for (i = 0; i < data.length; i++) {
+          var address = data[i];
+          contract.candidateData(address).then((candidate, err) => {
+            if (!err) {
+              _this.items.push({
+                name: candidate.name,
+                address: address,
+              });
+            }
           });
-        });
+        }
+      } else {
+        window.location.href = '/';
       }
     });
   },

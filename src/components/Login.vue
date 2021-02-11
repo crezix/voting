@@ -22,24 +22,31 @@
 </template>
 
 <script>
-//import { ethers } from "ethers";
+import {ethers} from 'ethers';
 export default {
   name: 'Login',
   methods: {
     login: function() {
-      window.ethereum.enable();
-      //const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const address = window.ethereum.selectedAddress;
-      console.log(address);
-      if (address != null) {
-        window.location.href = '/User/voting';
-      }
+      window.ethereum.enable().then((data) => {
+        console.log(data[0]);
+        const address = window.ethereum.selectedAddress;
+        console.log(address);
+        if (address != null) {
+          window.location.href = '/User/voting';
+        }
+      });
     },
   },
   created() {
-    const address = window.ethereum.selectedAddress;
-    if (address != null) {
-      window.location.href = '/User/voting';
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const address = provider.provider.selectedAddress;
+      console.log(address);
+      if (address != null) {
+        window.location.reload();
+      }
+    } catch (e) {
+      window.location.href = '/';
     }
   },
 };
